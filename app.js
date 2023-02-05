@@ -51,7 +51,7 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Methods",
     "OPTIONS, GET, POST, PUT, PATCH, DELETE"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Origin, X-Requested-With, Accept");
   next();
 });
 
@@ -69,7 +69,11 @@ mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGO_URL)
   .then(result=>{
-    app.listen(9090);
+    const server = app.listen(9090);
+    const io = require('./socket').init(server);
+    io.on('connection',socket=>{
+      console.log('client connected');
+    });
   })
   .catch(err=>{
     console.log(err);
